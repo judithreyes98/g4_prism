@@ -1,9 +1,12 @@
 #include "PhysicsList.hh"
 
 PhysicsList::PhysicsList(){
-    // EM Physics 
+
+    // em physics
     RegisterPhysics(new G4EmStandardPhysics());
 
+    // optic physics
+    RegisterPhysics(new G4OpticalPhysics());
 }
 
 PhysicsList::~PhysicsList(){}
