@@ -30,31 +30,20 @@ G4VPhysicalVolume *DetectorConstruction::Construct(){ // we are defining here ou
     std::vector<G4double> energies; // we start by defining a vector since we don't specify the number of elements 
     std::vector<G4double> rindices;
 
-    for (G4double lambda = 700; lambda >= 400; lambda -= 10) { // lambda en nm
-        G4double x = lambda / 1000.0; // pasa de nm a μm
+    for (G4double lambda = 700; lambda >= 400; lambda -= 10) { // IN DECREASING ENERGY ORDER !!
+        G4double x = lambda / 1000.0; // the expresion below is in um !
         G4double n = sqrt(1 + 0.614555251/(1 - 0.0145987884/pow(x,2))
                             + 0.656775017/(1 - 0.00287769588/pow(x,2))
                             + 1.02699346/(1 - 107.653051/pow(x,2)));
 
-        G4double E = (1.2398 / x) * eV; // energía del fotón (E = hc/λ), λ en mum
+        G4double E = (1.2398 / x) * eV; // energy of the photon in eV (x in um))
         energies.push_back(E);
         rindices.push_back(n);
     }
 
-    // convert to arrays because G4MaterialPropertiesTable only accepts arrays
-    G4int nEntries = energies.size();
-
-    auto energyArray = new G4double[nEntries];
-    auto rindexArray = new G4double[nEntries];
-
-    for (G4int i = 0; i < nEntries; ++i) {
-        energyArray[i] = energies[i];
-        rindexArray[i] = rindices[i];
-    }
-
-
     auto mptH9KL = new G4MaterialPropertiesTable();
-    mptH9KL->AddProperty("RINDEX", energyArray, rindexArray, nEntries);
+    mptH9KL->AddProperty("RINDEX", energies, rindices);
+    
     h9klMat->SetMaterialPropertiesTable(mptH9KL);
 
 
