@@ -15,6 +15,12 @@
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
 
+#include "G4OpticalSurface.hh"
+#include "G4MaterialPropertiesTable.hh"
+#include "G4LogicalBorderSurface.hh"
+#include "G4LogicalSkinSurface.hh"
+
+
 
 
 class DetectorConstruction : public G4VUserDetectorConstruction{

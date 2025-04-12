@@ -19,6 +19,8 @@ G4VPhysicalVolume *DetectorConstruction::Construct(){ // we are defining here ou
     // World material
     G4Material *worldMat = nist-> FindOrBuildMaterial("G4_AIR");
 
+    
+
     // Prism material
 
     G4Material* h9klMat = new G4Material("H9KL", 2.5 * g/cm3, 1);
@@ -47,6 +49,15 @@ G4VPhysicalVolume *DetectorConstruction::Construct(){ // we are defining here ou
     h9klMat->SetMaterialPropertiesTable(mptH9KL);
 
 
+    // Also need to define air's refractive index
+    std::vector<G4double> air_energies = energies;  // Use same energies as prism
+    std::vector<G4double> air_rindex(air_energies.size(), 1.0); // Air's refractive index ≈ 1.0
+    
+    auto mptAir = new G4MaterialPropertiesTable();
+    mptAir->AddProperty("RINDEX", air_energies, air_rindex);
+    worldMat->SetMaterialPropertiesTable(mptAir);
+
+
     // Defining the world volume
 
     G4double xWorld = 2. * m;
@@ -56,13 +67,13 @@ G4VPhysicalVolume *DetectorConstruction::Construct(){ // we are defining here ou
     G4Box *solidWorld = new G4Box("solidWorld", 0.5 * xWorld, 0.5 * yWorld, 0.5* zWorld);
     G4LogicalVolume *logicWorld = new G4LogicalVolume(solidWorld, worldMat, "logicWorld");
     G4VPhysicalVolume *physWorld = new G4PVPlacement(0, 
-        G4ThreeVector(0.,0.,0.), 
-        logicWorld, 
-        "physWorld", 
-        0, 
-        false, 
-        0, 
-        checkOverlaps);
+                                                    G4ThreeVector(0.,0.,0.), 
+                                                    logicWorld, 
+                                                    "physWorld", 
+                                                    0, 
+                                                    false, 
+                                                    0, 
+                                                    checkOverlaps);
 
 
     // Defining the prism to disperse the light
@@ -84,18 +95,31 @@ G4VPhysicalVolume *DetectorConstruction::Construct(){ // we are defining here ou
     auto rotation = new G4RotationMatrix();
     rotation->rotateX(90.*deg);
 
-    new G4PVPlacement(rotation,
-                    G4ThreeVector(0,0,0),
-                    logicPrism,
-                    "Prism",
-                    logicWorld,
-                    false,
-                    0,
-                    checkOverlaps);
+    G4VPhysicalVolume *physPrism =new G4PVPlacement(rotation,
+                                                    G4ThreeVector(0,0,0),
+                                                    logicPrism,
+                                                    "Prism",
+                                                    logicWorld,
+                                                    false,
+                                                    0,
+                                                    checkOverlaps);
 
+
+    // Define optical surfaces
+    G4OpticalSurface* opticalSurface = new G4OpticalSurface("PrismSurface");
+    opticalSurface->SetType(dielectric_dielectric);
+    opticalSurface->SetFinish(polished);
+    opticalSurface->SetModel(unified);
+
+    // Create the logical border surface
+    new G4LogicalBorderSurface("PrismSurface",
+                            physPrism,  // Make sure to save the physical volume pointer
+                            physWorld,
+                            opticalSurface);
 
 
     return physWorld;
+
 
 
 }
