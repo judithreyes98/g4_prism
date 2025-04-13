@@ -13,3 +13,8 @@
 /vis/scene/add/axes
 /vis/scene/add/eventID
 
+/run/beamOn 100
+
+/prism/setMaterial FusedSilica
+/run/reinitializeGeometry
+/vis/viewer/flush

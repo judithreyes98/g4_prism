@@ -30,6 +30,8 @@ int main(int argc, char** argv){
     // Action Initialization
     runManager -> SetUserInitialization(new ActionInitialization());
 
+    runManager->Initialize();
+
     G4VisManager* visManager = new G4VisExecutive();
 
     visManager -> Initialize();
@@ -39,7 +41,7 @@ int main(int argc, char** argv){
     UImanager->ApplyCommand("/control/execute vis.mac");
 
     ui -> SessionStart();
-
+    
     return 0;
 
 }

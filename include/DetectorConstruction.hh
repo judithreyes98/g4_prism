@@ -1,5 +1,5 @@
-#ifndef DETECTORCONSTRUCTION
-#define DETECTORCONSTRUCTION
+#ifndef DETECTORCONSTRUCTION_HH
+#define DETECTORCONSTRUCTION_HH
 
 #include "G4VUserDetectorConstruction.hh"
 
@@ -10,6 +10,7 @@
 #include "G4VPhysicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4Material.hh"
+#include "G4Element.hh"
 
 #include "G4NistManager.hh"
 #include "G4SystemOfUnits.hh"
@@ -20,18 +21,23 @@
 #include "G4LogicalBorderSurface.hh"
 #include "G4LogicalSkinSurface.hh"
 
+#include "DetectorMessenger.hh"
 
 
+class DetectorConstruction : public G4VUserDetectorConstruction {
+    public:
+      DetectorConstruction(G4String materialChoice = "H9KL");
+      virtual ~DetectorConstruction(); // virtual function cause its already defined in the parent class 
+      virtual G4VPhysicalVolume* Construct();
 
-class DetectorConstruction : public G4VUserDetectorConstruction{
-
-    public: 
-        DetectorConstruction();
-        virtual ~DetectorConstruction(); // virtual function cause its already defined in the parent class 
-
-        virtual G4VPhysicalVolume *Construct();
-
-};
+      void SetMaterial(const G4String& material);
+  
+    private:
+      G4String fMaterialChoice;  // material choice to be used in the prism
+      G4Material* fMaterial = nullptr;  
+      G4LogicalVolume* fLogicalVolume = nullptr; 
+      DetectorMessenger* fMessenger;
+  };
 
 
 #endif
