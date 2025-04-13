@@ -65,7 +65,8 @@ DetectorConstruction::DetectorConstruction(G4String materialChoice)
     : G4VUserDetectorConstruction(), 
     fMaterialChoice(materialChoice), 
     fMaterial(nullptr),
-    fLogicalVolume(nullptr) { 
+    fLogicalVolume(nullptr),
+    logicDetector(nullptr) { 
 
         fMessenger = new DetectorMessenger(this); // Create the messenger
 
@@ -144,6 +145,7 @@ G4VPhysicalVolume *DetectorConstruction::Construct(){ // we are defining here ou
     }
 
     prismMat->SetMaterialPropertiesTable(mptMat);
+    
 
     // Defining the world volume
 
@@ -180,7 +182,7 @@ G4VPhysicalVolume *DetectorConstruction::Construct(){ // we are defining here ou
 
     fLogicalVolume = logicPrism;
 
-    // Rotar 90 grados en X para que Z pase a ser vertical
+    // Rotation of 90 degrees to place the prism in the g4 axis definition
     auto rotation = new G4RotationMatrix();
     rotation->rotateX(90.*deg);
 
@@ -192,8 +194,6 @@ G4VPhysicalVolume *DetectorConstruction::Construct(){ // we are defining here ou
                                                     false,
                                                     0,
                                                     checkOverlaps);
-
-    
 
 
     // Define optical surfaces
@@ -209,8 +209,45 @@ G4VPhysicalVolume *DetectorConstruction::Construct(){ // we are defining here ou
                             opticalSurface);
 
 
+    // Define a sensitive detector to save the energy and position of the photons
+
+    G4double det_x = 2*cm;
+    G4double det_y = 40*cm;
+    G4double det_z = 40*cm;
+
+    G4Box* solidDetector = new G4Box("Detector", 0.5 * det_x, 0.5 * det_y, 0.5 * det_z);
+    G4Material* detMaterial = nist->FindOrBuildMaterial("G4_AIR"); // it doesn't matter the material we use
+
+    logicDetector = new G4LogicalVolume(solidDetector, detMaterial, "LogicDetector");
+
+    // position behind the prism
+    G4ThreeVector posDetector( prism_length/2 + det_z/2 + 1*cm, 0, 0); //with a separation of 1 cm
+
+    new G4PVPlacement(nullptr, posDetector, logicDetector, "PhysDetector", logicWorld, false, 0, checkOverlaps);
+
     return physWorld;
 
 
 }
 
+void DetectorConstruction::ConstructSDandField(){
+
+    //G4cout << "Constructing sensitive detectors..." << G4endl;
+
+    if(logicDetector != nullptr) {
+
+
+        G4SDManager *sdManager = G4SDManager::GetSDMpointer();
+
+        SensitiveDetector *sensDet = new SensitiveDetector("SensitiveDetector");
+    
+        sdManager->AddNewDetector(sensDet);
+
+        logicDetector->SetSensitiveDetector(sensDet);
+        //G4cout << "Sensitive detector set for logicDetector" << G4endl;
+
+    } else {
+        G4cerr << "Error: logicDetector is null in ConstructSDandField" << G4endl;
+    }
+    
+}

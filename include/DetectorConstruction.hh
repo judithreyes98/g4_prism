@@ -16,12 +16,18 @@
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
 
+#include "G4OpticalPhoton.hh"
 #include "G4OpticalSurface.hh"
 #include "G4MaterialPropertiesTable.hh"
 #include "G4LogicalBorderSurface.hh"
 #include "G4LogicalSkinSurface.hh"
 
+#include "G4VisAttributes.hh"
+#include "G4Color.hh"
+#include "G4SDManager.hh"
+
 #include "DetectorMessenger.hh"
+#include "SensitiveDetector.hh"
 
 
 class DetectorConstruction : public G4VUserDetectorConstruction {
@@ -37,6 +43,10 @@ class DetectorConstruction : public G4VUserDetectorConstruction {
       G4Material* fMaterial = nullptr;  
       G4LogicalVolume* fLogicalVolume = nullptr; 
       DetectorMessenger* fMessenger;
+
+      G4LogicalVolume *logicDetector; 
+
+      virtual void ConstructSDandField();
   };
 
 

@@ -3,6 +3,12 @@
 
 #include "G4VSensitiveDetector.hh"
 
+#include "G4Step.hh"
+#include "G4HCofThisEvent.hh"
+#include "G4TouchableHistory.hh"
+#include "globals.hh"
+#include "G4OpticalPhoton.hh"
+
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
 
