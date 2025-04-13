@@ -13,35 +13,31 @@ AnalysisManager* AnalysisManager::Instance() {
 
 void AnalysisManager::Init() {
 
-    if (fManager == nullptr) {
-        fManager = G4AnalysisManager::Instance();
-        fManager->SetVerboseLevel(1);
-
-        fManager->SetDefaultFileType("root");
-
-        fManager->OpenFile("../photon_data.root");
-
-        // create ntuple
-        fManager->CreateNtuple("Photons", "Detected optical photons");
-        fManager->CreateNtupleDColumn("Energy_eV");
-        fManager->CreateNtupleDColumn("X_mm");
-        fManager->CreateNtupleDColumn("Y_mm");
-        fManager->CreateNtupleDColumn("Z_mm");
-        fManager->FinishNtuple();
+    // open CSV file to write
+    fOutputFile.open("../photon_data.csv", std::ios::out);
+    if (fOutputFile.is_open()) {
+        // header
+        fOutputFile << "Energy_eV,X_mm,Y_mm,Z_mm\n";
     } else {
-        G4cout << "G4AnalysisManager already initialized!" << G4endl;
+        G4cout << "Output file is not opening!" << G4endl;
     }
+
 }
 
 void AnalysisManager::FillPhotonData(G4double energy, G4ThreeVector pos) {
-    fManager->FillNtupleDColumn(0, energy / eV);
-    fManager->FillNtupleDColumn(1, pos.x() / mm);
-    fManager->FillNtupleDColumn(2, pos.y() / mm);
-    fManager->FillNtupleDColumn(3, pos.z() / mm);
-    fManager->AddNtupleRow();
+
+    if (fOutputFile.is_open()) {
+        fOutputFile << energy / eV << "," 
+                    << pos.x() / mm << ","
+                    << pos.y() / mm << ","
+                    << pos.z() / mm << "\n";
+                    fOutputFile.flush(); 
+    }
 }
 
 void AnalysisManager::Save() {
-    fManager->Write();
-    fManager->CloseFile();
+    // close the file
+    if (fOutputFile.is_open()) {
+        fOutputFile.close();
+    }
 }

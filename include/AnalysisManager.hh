@@ -4,18 +4,21 @@
 
 #include "G4AnalysisManager.hh"
 #include "G4SystemOfUnits.hh"
+#include <fstream>  
 
 class AnalysisManager {
 public:
     static AnalysisManager* Instance();
-    static void Init();
-    static void FillPhotonData(G4double energy, G4ThreeVector pos);
-    static void Save();
+    void Init();
+    void FillPhotonData(G4double energy, G4ThreeVector pos);
+    void Save();
 
 private:
     AnalysisManager() {} // Private constructor
     static AnalysisManager* fInstance;
     static G4AnalysisManager* fManager;
+    std::ofstream fOutputFile;
+    
 };
 
 #endif
