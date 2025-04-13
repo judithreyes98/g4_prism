@@ -12,6 +12,8 @@
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
 
+#include "AnalysisManager.hh"
+
 class SensitiveDetector : public G4VSensitiveDetector{
 
 

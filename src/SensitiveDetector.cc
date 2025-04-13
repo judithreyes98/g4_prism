@@ -41,6 +41,20 @@ G4bool SensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory * ){
         G4cout << "Optical photon detected! Energy: "
                << photonEnergy/eV << " eV, Position: "
                << pos << ", Time: " << time/ns << " ns" << G4endl;
+
+        
+        // Ensure AnalysisManager is initialized
+        AnalysisManager* analysisManager = AnalysisManager::Instance();
+        if (analysisManager) {
+            static bool initialized = false;
+            if (!initialized) {
+                analysisManager->Init();
+                initialized = true;
+            }
+            analysisManager->FillPhotonData(photonEnergy, pos);
+        } else {
+            G4cerr << "Error: AnalysisManager instance is not initialized!" << G4endl;
+        }
     
         // stop the photon
         track->SetTrackStatus(fStopAndKill);
